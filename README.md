@@ -21,9 +21,9 @@ It's gained attraction in corporate environment and eventually became a drop-in 
 - Connect to web services, process and manipulate data, send it back
 
 ### Building instructions
-- Fork the ´engine´ repository and build the ´engine.dll´ by using visual studio 2015. Main branch pre-configured for dll deployment.
-- Fork the ´boot´ repository and create the ´engine.js´ by running ´merge.bat´
-- Drop the both files into project sources and run ´res.bat resources.rc´ to generate resource file
+- Fork the `engine` repository and build the `engine.dll` by using visual studio 2015. Main branch pre-configured for dll deployment.
+- Fork the `boot` repository and create the `engine.js` by running `merge.bat`
+- Drop the both files into project sources and run `res.bat resources.rc` to generate resource file
 - Generate the executable by compiling gdi.dpk
 
 ### Uses
