@@ -1,0 +1,28 @@
+MAINICON ICON "gdi.final.ico"
+boot RCDATA "engine.js"
+update RCDATA "updater.js"
+1 VERSIONINFO
+FILEVERSION 0,2,1,1
+PRODUCTVERSION 0,2,1,1
+FILEOS 0x4
+FILETYPE 0x1
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName", "https://gdi.sh" 
+            VALUE "FileDescription", "Javascript Interpreter for Microsoft Windows" 
+            VALUE "FileVersion", "0.2.1.1" 
+            VALUE "InternalName", "gdi.exe" 
+            VALUE "LegalCopyright", "https://gdi.sh" 
+            VALUE "OriginalFilename", "GDI.exe" 
+            VALUE "ProductName", "GDI.js" 
+            VALUE "ProductVersion", "0.2.1.1" 
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END

@@ -1,0 +1,5 @@
+prototype: extension functions to built-in v8 objects (referred as basics)
+constants: static globals like setTimeout(), setInterval()
+natives: functions that processed at application layer
+objects: functions that processed at v8 layer
+modules: built-in modules that utilizes the native functions

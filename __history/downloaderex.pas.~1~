@@ -1,0 +1,52 @@
+﻿unit downloaderex;
+
+interface
+uses
+windows, System.Net.HttpClient,Web.HTTPApp, System.SysUtils,
+  System.Classes;
+
+type
+  TDownloader = class
+  private
+    FHttpClient: THTTPClient;
+    procedure OnReceiveData(const Sender: TObject; AContentLength, AReadCount: Int64; var AAbort: Boolean);
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure DownloadFile(const URL, FileName: string);
+  end;
+
+constructor TDownloader.Create;
+begin
+  inherited Create;
+  FHttpClient := TNetHTTPClient.Create(nil);
+  FHttpClient.OnReceiveData := OnReceiveData;
+end;
+
+destructor TDownloader.Destroy;
+begin
+  FHttpClient.Free;
+  inherited;
+end;
+
+procedure TDownloader.OnReceiveData(const Sender: TObject; AContentLength, AReadCount: Int64; var AAbort: Boolean);
+begin
+  WriteLn('Received ', AReadCount, ' of ', AContentLength, ' bytes');
+end;
+
+procedure TDownloader.DownloadFile(const URL, FileName: string);
+var
+  FileStream: TFileStream;
+  Response: IHTTPResponse;
+begin
+  FileStream := TFileStream.Create(FileName, fmCreate);
+  try
+    Response := FHttpClient.Get(URL, FileStream);
+    if Response.StatusCode = 200 then
+      WriteLn('Download successful.')
+    else
+      WriteLn('Failed to download the file. Status code: ', Response.StatusCode);
+  finally
+    FileStream.Free;
+  end;
+end;

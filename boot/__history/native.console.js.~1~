@@ -1,0 +1,26 @@
+
+/* global __con */
+
+var console = {
+    log: function (a) {
+        switch (typeof a) {
+            case "object":
+                $c.log(JSON.stringify(a));
+                break;
+            case "undefined":
+                $c.log("undefined");
+                break;
+            default:
+                if (a instanceof Array) {
+                    var tmp = {};
+                    for (var i = 0; i < a.length; i++) {
+                        tmp[i] = a[i];
+                    }
+                    $c.log("Array(" + a.length + "): " + $c.log(JSON.stringify(tmp)));
+                    return;
+                }
+                $c.log(a);
+        }
+    }
+};
+

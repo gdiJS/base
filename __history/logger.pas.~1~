@@ -1,0 +1,18 @@
+﻿unit logger;
+
+uses
+windows,
+sysutils;
+
+interface
+
+Tlogger = class
+  constructor create(filename:String);
+end;
+
+
+implementation
+
+
+
+end.

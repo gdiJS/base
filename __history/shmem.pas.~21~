@@ -1,0 +1,113 @@
+unit shmem;
+
+interface
+uses
+  SysUtils, Windows, threads;
+
+  type
+Tsharedmem = class
+  mode:integer;     // this library cannot be used same time both send and receive. use different instances
+  SharedMemHandle: THandle;
+  SharedMemPtr: Pointer;
+  EventHandle: THandle;
+  buffer:ansistring;
+  ready:boolean;
+  procedure send(MsgToSend:ansistring);
+  constructor create(name:ansistring;SharedMemSize:integer=4096);
+  destructor free;
+  procedure error(content:ansistring);
+end;
+
+implementation
+
+
+var
+  SharedMemSize: integer
+  SharedMemName: ansistring;
+
+procedure MessageServer;
+var
+  SharedMemHandle: THandle;
+  SharedMemPtr: Pointer;
+  EventHandle: THandle;
+  MsgSink:widestring;
+begin
+
+ try
+    SharedMemHandle := CreateFileMapping(INVALID_HANDLE_VALUE, nil, PAGE_READWRITE, 0, SharedMemSize,SharedMemName);
+    if SharedMemHandle = 0 then
+      RaiseLastOSError;
+
+    SharedMemPtr := MapViewOfFile(SharedMemHandle, FILE_MAP_WRITE, 0, 0, SharedMemSize);
+    if SharedMemPtr = nil then
+      RaiseLastOSError;
+
+    EventHandle := CreateEvent(nil, True, False,SharedMemName+'_');
+    if EventHandle = 0 then
+      RaiseLastOSError;
+
+    MsgServerActive:=true;
+    while MsgServerActive=True do
+    begin
+      WaitForSingleObject(EventHandle, INFINITE);
+      MsgSink:=trim(PAnsiChar(SharedMemPtr));
+      ResetEvent(EventHandle);
+      if msgSink <> '' then form1.sendstring(form1.handle,msgSink);
+    end;
+
+  finally
+    if SharedMemPtr <> nil then
+      UnmapViewOfFile(SharedMemPtr);
+    if SharedMemHandle <> 0 then
+      CloseHandle(SharedMemHandle);
+    if EventHandle <> 0 then
+      CloseHandle(EventHandle);
+  end;
+
+end;
+
+{ name is required, size is optional}
+constructor Tsharedmem.create(name:ansistring;SharedMemSize:integer=4096);
+begin
+    SharedMemHandle := OpenFileMapping(FILE_MAP_WRITE, False, pwidechar(name));
+    if SharedMemHandle = 0 then error('Failed to open shared memory');
+
+    SharedMemPtr := MapViewOfFile(SharedMemHandle, FILE_MAP_WRITE, 0, 0, SharedMemSize);
+    if SharedMemPtr = nil then error('Failed to map shared memory');
+
+    EventHandle := OpenEvent(EVENT_MODIFY_STATE, False, pwidechar(name+'_'));
+    if EventHandle = 0 then error('Failed to open event');
+  ready:=true;
+end;
+
+procedure Tsharedmem.send(MsgToSend:ansistring);
+begin
+if not ready then error('engine not initialized');
+
+buffer:=ansistring(MsgToSend);
+if buffer <> '' then begin
+StrPCopy(PAnsiChar(SharedMemPtr), buffer);
+SetEvent(EventHandle);
+end;
+end;
+
+destructor Tsharedmem.free;
+begin
+   if SharedMemPtr <> nil then
+      UnmapViewOfFile(SharedMemPtr);
+
+    if SharedMemHandle <> 0 then
+      CloseHandle(SharedMemHandle);
+
+    if EventHandle <> 0 then
+      CloseHandle(EventHandle);
+
+end;
+
+
+procedure Tsharedmem.error(content:ansistring);
+begin
+ outputdebugstringW(pwidechar('shmem: '+content));
+end;
+
+end.

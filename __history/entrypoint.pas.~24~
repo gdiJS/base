@@ -1,0 +1,49 @@
+unit entrypoint;
+
+interface
+
+uses
+  windows, System.SysUtils, jsruntime, judithkernel, classes, logger;
+
+const
+  version_info = 'v1.2';
+  version_dec = 1.2;
+  version_info_long = version_info + ' - May 2024';
+  logfilename = 'engine.log';
+  libpath = '';
+
+var
+  __shutdown: Boolean;
+  __done: Boolean;
+  boot: Boolean;
+  root: string;
+  ahandle: THandle;
+  index: string;
+  WM_JUDITH: DWORD;
+  judith: Tjudith;
+  mode: integer;
+  nokill: boolean;
+  scripts: array of string;
+  log: Tlogger;
+  killedparent: boolean;
+  parentid: cardinal;
+  repl:boolean;
+  incel:boolean;
+
+implementation
+
+uses
+  console;
+
+procedure debug(text: string);
+begin
+  if assigned(log) then
+    log.write(text);
+  if mode = 3 then
+    MessageBox(GetForegroundWindow, pchar(text), pchar('GDI.js'), MB_ICONWARNING or MB_OK)
+  else
+    WriteColoredText(text, FOREGROUND_NORMAL);
+end;
+
+end.
+

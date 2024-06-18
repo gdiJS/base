@@ -1,0 +1,71 @@
+﻿unit nativedialogs;
+
+interface
+
+uses
+  windows, sysutils, messages;
+
+implementation
+
+function InputDlgProc(hDlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
+var
+  Buffer: array[0..255] of Char;
+begin
+  case Msg of
+    WM_INITDIALOG:
+      begin
+        // Set initial focus to the input text box
+        SetFocus(GetDlgItem(hDlg, 1001));
+        Result := False; // Return FALSE if setting focus
+      end;
+    WM_COMMAND:
+      begin
+        case LOWORD(wParam) of
+          IDOK:
+            begin
+              GetDlgItemText(hDlg, 1001, Buffer, SizeOf(Buffer));
+              EndDialog(hDlg, Integer(PChar(@Buffer)));
+              Result := True;
+            end;
+          IDCANCEL:
+            begin
+              EndDialog(hDlg, 0);
+              Result := True;
+            end;
+        end;
+      end;
+  else
+    Result := False;
+  end;
+end;
+
+function InputQuery(const ACaption, APrompt: string): string;
+var
+  DialogTemplate: array[0..2047] of Char;
+  DialogInfo: TDlgTemplate;
+  ItemTemplate: TDlgItemTemplate;
+begin
+  // Initialize dialog info (simple rectangular dialog box)
+  FillChar(DialogTemplate, SizeOf(DialogTemplate), 0);
+  DialogInfo := Default(TDlgTemplate);
+  DialogInfo.style := WS_POPUP or WS_BORDER or WS_SYSMENU or DS_MODALFRAME or DS_CENTER or WS_CAPTION;
+  DialogInfo.dwExtendedStyle := WS_EX_DLGMODALFRAME;
+  DialogInfo.cdit := 3;  // Number of controls
+  DialogInfo.x := 0;
+  DialogInfo.y := 0;
+  DialogInfo.cx := 240;
+  DialogInfo.cy := 120;
+
+  Move(DialogInfo, DialogTemplate[0], SizeOf(DialogInfo));
+
+  // Here you would add items/templates for labels, text box, and buttons
+  // For simplicity, the setup of these controls is omitted.
+
+  // Display the dialog
+  Result := '';
+  if DialogBoxIndirectParam(HInstance, PDialogTemplate(@DialogTemplate), 0, @InputDlgProc, 0) <> 0 then
+    Result := PChar(@DialogTemplate);
+end;
+
+end.
+
